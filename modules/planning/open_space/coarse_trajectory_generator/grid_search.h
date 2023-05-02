@@ -41,7 +41,8 @@ class Node2d {
   Node2d(const double x, const double y, const double xy_resolution,
          const std::vector<double>& XYbounds) {
     // XYbounds with xmin, xmax, ymin, ymax
-    grid_x_ = static_cast<int>((x - XYbounds[0]) / xy_resolution);
+    // (x-xmin)/分辨率=网格下的坐标 y同理
+    grid_x_ = static_cast<int>((x - XYbounds[0]) / xy_resolution);    // static_cast<int> 强制转换为int类型
     grid_y_ = static_cast<int>((y - XYbounds[2]) / xy_resolution);
     index_ = ComputeStringIndex(grid_x_, grid_y_);
   }
@@ -82,17 +83,17 @@ class Node2d {
 
  private:
   static std::string ComputeStringIndex(int x_grid, int y_grid) {
-    return absl::StrCat(x_grid, "_", y_grid);
+    return absl::StrCat(x_grid, "_", y_grid);   // absl::StrCat用于将多个对象拼接成一个字符串
   }
 
  private:
   int grid_x_ = 0;
   int grid_y_ = 0;
-  double path_cost_ = 0.0;
-  double heuristic_ = 0.0;
-  double cost_ = 0.0;
+  double path_cost_ = 0.0;    // g
+  double heuristic_ = 0.0;    // h
+  double cost_ = 0.0;         // f = g + h
   std::string index_;
-  std::shared_ptr<Node2d> pre_node_ = nullptr;
+  std::shared_ptr<Node2d> pre_node_ = nullptr;    // 父节点
 };
 
 struct GridAStartResult {
@@ -105,6 +106,7 @@ class GridSearch {
  public:
   explicit GridSearch(const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~GridSearch() = default;
+  // A*搜索路径
   bool GenerateAStarPath(
       const double sx, const double sy, const double ex, const double ey,
       const std::vector<double>& XYbounds,
